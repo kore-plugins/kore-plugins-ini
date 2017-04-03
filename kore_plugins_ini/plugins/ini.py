@@ -6,10 +6,9 @@ from configparser import ConfigParser
 from kore.configs.plugins.base import BasePluginConfig
 
 
-class IniConfig(ConfigParser, BasePluginConfig):
+class IniConfig(BasePluginConfig):
 
     def __init__(self, *args, **kwargs):
-        super(IniConfig, self).__init__()
         try:
             ini_file = kwargs['ini_file']
         except KeyError:
@@ -28,7 +27,20 @@ class IniConfig(ConfigParser, BasePluginConfig):
                        disable_existing_loggers=ini_logging_disable_existing)
 
         self.prefix = ini_prefix
-        self.read(ini_file)
+        self.config_parser = ConfigParser()
+        self.config_parser.read(ini_file)
 
     def __getitem__(self, key):
-        return super(IniConfig, self).__getitem__(self.prefix + key)
+        return self.config_parser[self.prefix + key]
+
+    def __iter__(self):
+        return iter(self.config_parser)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def keys(self):
+        return self.config_parser.keys()

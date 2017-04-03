@@ -42,7 +42,7 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
         ini_file.flush()
         yield ini_file
 
-    def test_ini_fiel_not_found(self):
+    def test_file_not_found(self):
         config_type = 'ini'
         config_opt = {
             'ini_file': 'test.ini',
@@ -52,7 +52,29 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
         with pytest.raises(RuntimeError):
             config_factory.create(config_type, **config_opt)
 
-    def test_ini_file_section(self, ini_file):
+    def test_get_section(self, ini_file):
+        config_type = 'ini'
+        config_opt = {
+            'ini_file': ini_file.name,
+            'bar': 'baz',
+        }
+
+        config = config_factory.create(config_type, **config_opt)
+
+        assert config.get('UNDEFINED') is None
+
+    def test_get_section_default_value(self, ini_file):
+        config_type = 'ini'
+        config_opt = {
+            'ini_file': ini_file.name,
+            'bar': 'baz',
+        }
+
+        config = config_factory.create(config_type, **config_opt)
+
+        assert config.get('UNDEFINED', 'undefined') == 'undefined'
+
+    def test_section_option(self, ini_file):
         config_type = 'ini'
         config_opt = {
             'ini_file': ini_file.name,
@@ -63,7 +85,7 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
 
         assert config['TESTING']['key'] == 'value'
 
-    def test_ini_file_get_value(self, ini_file):
+    def test_get_value(self, ini_file):
         config_type = 'ini'
         config_opt = {
             'ini_file': ini_file.name,
@@ -72,9 +94,9 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
 
         config = config_factory.create(config_type, **config_opt)
 
-        assert config['TESTING'].get('key2', {}) == {}
+        assert config['TESTING'].get('key2', 'undefined') == 'undefined'
 
-    def test_ini_logging(self, ini_file_with_logging):
+    def test_logging(self, ini_file_with_logging):
         config_type = 'ini'
         config_opt = {
             'ini_file': ini_file_with_logging.name,
@@ -84,4 +106,6 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
 
         config = config_factory.create(config_type, **config_opt)
 
-        assert config['TESTING'].get('key2', {}) == {}
+        assert config['loggers']['keys'] == 'root'
+        assert config['handlers']['keys'] == 'console'
+        assert config['formatters']['keys'] == 'generic'
