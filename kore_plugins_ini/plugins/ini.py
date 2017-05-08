@@ -1,9 +1,9 @@
 from os.path import isfile
 from logging.config import fileConfig
 
-from configparser import ConfigParser
-
 from kore.configs.plugins.base import BasePluginConfig
+
+from kore_plugins_ini.parsers import CaseConfigParser
 
 
 class IniConfig(BasePluginConfig):
@@ -27,7 +27,7 @@ class IniConfig(BasePluginConfig):
                        disable_existing_loggers=ini_logging_disable_existing)
 
         self.prefix = ini_prefix
-        self.config_parser = ConfigParser()
+        self.config_parser = CaseConfigParser()
         self.config_parser.read(ini_file)
 
     def __getitem__(self, key):
