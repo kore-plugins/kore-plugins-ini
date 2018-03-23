@@ -58,7 +58,7 @@ ini = kore_plugins_ini.ini:IniConfig
 
 
 setup(
-    name='kore_plugins_ini',
+    name='kore-plugins-ini',
     version=metadata['version'],
     author=metadata['author'],
     author_email=metadata['email'],
