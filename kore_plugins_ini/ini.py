@@ -6,6 +6,18 @@ from kore.configs.plugins.base import BasePluginConfig
 from kore_plugins_ini.parsers import CaseConfigParser
 
 
+class IniSection(object):
+
+    def __init__(self, section):
+        self.section = section
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
 class IniConfig(BasePluginConfig):
 
     def __init__(self, *args, **kwargs):
@@ -41,6 +53,9 @@ class IniConfig(BasePluginConfig):
             return self[key]
         except KeyError:
             return default
+
+    def get_section(self, name):
+        return self.config_parser[name]
 
     def keys(self):
         return self.config_parser.keys()

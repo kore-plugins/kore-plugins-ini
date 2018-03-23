@@ -65,10 +65,10 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
             'ini_file': ini_file.name,
             'bar': 'baz',
         }
-
         config = config_factory.create(config_type, **config_opt)
-
-        assert config.get('UNDEFINED') is None
+        
+        with pytest.raises(KeyError):
+            config.get_section('UNDEFINED')
 
     def test_get_section_default_value(self, ini_file):
         config_type = 'ini'
@@ -78,8 +78,11 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
         }
 
         config = config_factory.create(config_type, **config_opt)
+        section = config.get_section('TESTING')
 
-        assert config.get('UNDEFINED', 'undefined') == 'undefined'
+        result = config.get('UNDEFINED', 'undefined')
+
+        assert result == 'undefined'
 
     def test_section_option(self, ini_file):
         config_type = 'ini'
@@ -87,10 +90,12 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
             'ini_file': ini_file.name,
             'bar': 'baz',
         }
-
         config = config_factory.create(config_type, **config_opt)
+        section = config.get_section('TESTING')
 
-        assert config['TESTING']['key'] == 'value'
+        result = section['key']
+
+        assert result == 'value'
 
     def test_section_option_upper(self, ini_file_upper):
         config_type = 'ini'
@@ -98,10 +103,12 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
             'ini_file': ini_file_upper.name,
             'bar': 'baz',
         }
-
         config = config_factory.create(config_type, **config_opt)
+        section = config['TESTING']
 
-        assert dict(config['TESTING']) == {
+        result = dict(section)
+
+        assert result == {
             'KEY': 'value',
         }
 
@@ -111,10 +118,12 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
             'ini_file': ini_file.name,
             'bar': 'baz',
         }
-
         config = config_factory.create(config_type, **config_opt)
+        section = config.get_section('TESTING')
 
-        assert config['TESTING'].get('key2', 'undefined') == 'undefined'
+        result = section.get('key2', 'undefined')
+
+        assert result == 'undefined'
 
     def test_logging(self, ini_file_with_logging):
         config_type = 'ini'
@@ -123,9 +132,16 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
             'ini_logging': True,
             'ini_logging_disable_existing': False,
         }
-
         config = config_factory.create(config_type, **config_opt)
 
-        assert config['loggers']['keys'] == 'root'
-        assert config['handlers']['keys'] == 'console'
-        assert config['formatters']['keys'] == 'generic'
+        loggers = config.get_section('loggers')
+
+        assert loggers['keys'] == 'root'
+
+        handlers = config.get_section('handlers')
+
+        assert handlers['keys'] == 'console'
+
+        formatters = config.get_section('formatters')
+
+        assert formatters['keys'] == 'generic'

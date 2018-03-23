@@ -53,7 +53,7 @@ metadata = get_metadata(init_py)
 
 entry_points = """\
 [kore.configs]
-ini = kore_plugins_ini.plugins.ini:IniConfig
+ini = kore_plugins_ini.ini:IniConfig
 """
 
 
